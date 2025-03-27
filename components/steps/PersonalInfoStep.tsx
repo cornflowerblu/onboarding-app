@@ -3,7 +3,7 @@ import { useOnboarding } from '../../context/OnboardingContext';
 import { personalInfoSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
 import { useState } from 'react';
-import { Dialog } from '@headlessui/react';
+import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 
 export default function PersonalInfoStep() {
   const { state, updateStepData, updateStep, loadExistingApplication } = useOnboarding();
@@ -20,6 +20,14 @@ export default function PersonalInfoStep() {
     }
     setCheckingEmail(false);
   };
+
+  const handleDateChange = (date: string) => {
+    updateStepData('personalInfo', {
+      ...state.personalInfo,
+      dateOfBirth: new Date(date).toISOString().split('T')[0]
+    });
+  };
+  
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -54,6 +62,7 @@ export default function PersonalInfoStep() {
               label="Date of Birth"
               name="dateOfBirth"
               type="date"
+              onChange={(e: any) => handleDateChange(e.target.value)}
             />
             <FormField label="Address" name="address" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -88,15 +97,15 @@ export default function PersonalInfoStep() {
         className="fixed z-10 inset-0 overflow-y-auto"
       >
         <div className="flex items-center justify-center min-h-screen">
-          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+          <DialogBackdrop className="fixed inset-0 bg-black opacity-30" />
 
           <div className="relative bg-white rounded-lg p-8 max-w-md mx-auto">
-            <Dialog.Title className="text-lg font-medium">
+            <DialogTitle className="text-lg font-medium">
               Existing Application Found
-            </Dialog.Title>
-            <Dialog.Description className="mt-2">
+            </DialogTitle>
+            <Description className="mt-2">
               We found an existing application for this email. Would you like to continue where you left off?
-            </Dialog.Description>
+            </Description>
 
             <div className="mt-4 flex justify-end space-x-4">
               <button

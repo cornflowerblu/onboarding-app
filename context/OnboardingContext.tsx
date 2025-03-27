@@ -17,7 +17,7 @@ const defaultState: OnboardingState = {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    dateOfBirth: '',
+    dateOfBirth: new Date().toISOString().split('T')[0],
     address: '',
     city: '',
     state: '',

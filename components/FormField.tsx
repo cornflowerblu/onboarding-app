@@ -6,6 +6,8 @@ interface FormFieldProps {
   type?: string;
   placeholder?: string;
   className?: string;
+  onChange?: (e: React.ChangeEvent<any>) => void;
+  onBlur?: (e: React.FocusEvent<any>) => void;
 }
 
 export default function FormField({

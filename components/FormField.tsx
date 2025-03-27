@@ -1,3 +1,4 @@
+import { on } from 'events';
 import { Field, ErrorMessage } from 'formik';
 
 interface FormFieldProps {
@@ -6,6 +7,7 @@ interface FormFieldProps {
   type?: string;
   placeholder?: string;
   className?: string;
+  value?: any;
   onChange?: (e: React.ChangeEvent<any>) => void;
   onBlur?: (e: React.FocusEvent<any>) => void;
 }
@@ -15,7 +17,8 @@ export default function FormField({
   name,
   type = 'text',
   placeholder,
-  className = ''
+  className = '',
+  onBlur
 }: FormFieldProps) {
   return (
     <div className="mb-4">
@@ -29,6 +32,7 @@ export default function FormField({
         placeholder={placeholder}
         className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
  sm:text-sm ${className}`}
+          onBlur={onBlur}
       />
       <ErrorMessage
         name={name}

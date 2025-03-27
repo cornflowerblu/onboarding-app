@@ -4,9 +4,10 @@ import { personalInfoSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
 import { useState } from 'react';
 import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import { OnboardingState } from '@/types/onboarding';
 
 export default function PersonalInfoStep() {
-  const { state, updateStepData, updateStep, loadExistingApplication } = useOnboarding();
+  const { state, updateStepData, updateStep, loadExistingApplication, saveApplication } = useOnboarding();
   const [showExistingModal, setShowExistingModal] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
 
@@ -21,33 +22,55 @@ export default function PersonalInfoStep() {
     setCheckingEmail(false);
   };
 
-  const handleDateChange = (date: string) => {
-    updateStepData('personalInfo', {
+  const handleBlur = (values: any) => {
+    updateStepData('personalInfo', values)
+  }
+
+  const formatInitialValues = (state: OnboardingState) => {
+    if (!state.personalInfo?.dateOfBirth) return state.personalInfo;
+
+    return {
       ...state.personalInfo,
-      dateOfBirth: new Date(date).toISOString().split('T')[0]
-    });
+      dateOfBirth: new Date(state.personalInfo.dateOfBirth).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric'
+      })
+    };
   };
-  
+
 
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Personal Information</h2>
 
       <Formik
-        initialValues={state.personalInfo}
+        initialValues={formatInitialValues(state)}
         validationSchema={personalInfoSchema}
         onSubmit={async (values) => {
-          await updateStepData('personalInfo', values);
+          // First update the state with the final form values
+          const formattedValues = {
+            ...values,
+            dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString() : null
+          };
+          updateStepData('personalInfo', formattedValues);
+
+          // Then save the entire state
+          await saveApplication(state);
           updateStep(3);
         }}
       >
         {({ values, isSubmitting }) => (
-          <Form className="space-y-4">
+          <Form className="space-y-4"
+            onBlur={() => {
+              const dob = new Date(values.dateOfBirth).toISOString() || null
+              handleBlur({ ...values, dateOfBirth: dob })
+            }}
+          >
             <FormField
               label="Email"
               name="email"
               type="email"
-              onBlur={() => handleEmailBlur(values.email)}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="First Name" name="firstName" />
@@ -62,7 +85,6 @@ export default function PersonalInfoStep() {
               label="Date of Birth"
               name="dateOfBirth"
               type="date"
-              onChange={(e: any) => handleDateChange(e.target.value)}
             />
             <FormField label="Address" name="address" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

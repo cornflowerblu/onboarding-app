@@ -8,6 +8,7 @@ interface OnboardingContextType {
   updateStep: (step: OnboardingStep) => void;
   updateStepData: (stepName: keyof OnboardingState, data: any) => void;
   loadExistingApplication: (email: string) => Promise<boolean>;
+  saveApplication: (application: OnboardingState) => Promise<void>;
 }
 
 const defaultState: OnboardingState = {
@@ -17,7 +18,7 @@ const defaultState: OnboardingState = {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    dateOfBirth: new Date().toISOString().split('T')[0],
+    dateOfBirth: '',
     address: '',
     city: '',
     state: '',
@@ -79,16 +80,45 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     });
 
     // Save to database
+  };
+
+  const saveApplication = async (application: OnboardingState) => {
     try {
-      await fetch('/api/onboarding/save', {
+      // Extract email for database lookup
+      const userIdentifier = {
+        email: application.personalInfo.email
+      };
+  
+      // Create a properly typed payload
+      const payload = {
+        identifier: userIdentifier,
+        data: application
+      };
+  
+      const response = await fetch('/api/onboarding/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ step: stepName, data }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
       });
+      const data = await response.json();
+      console.log('Application saved:', data);
     } catch (error) {
-      console.error('Failed to save step data:', error);
+      console.error('Failed to save application:', error);
     }
   };
+  
+
+      // try {      
+    //   await fetch('/api/onboarding/save', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ step: stepName, data }),
+    //   });
+    // } catch (error) {
+    //   console.error('Failed to save step data:', error);
+    // }
 
   const loadExistingApplication = async (email: string): Promise<boolean> => {
     try {
@@ -112,7 +142,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <OnboardingContext.Provider value={{ state, updateStep, updateStepData, loadExistingApplication }}>
+    <OnboardingContext.Provider value={{ state, updateStep, updateStepData, loadExistingApplication, saveApplication }}>
       {children}
     </OnboardingContext.Provider>
   );

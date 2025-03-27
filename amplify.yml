@@ -1,0 +1,30 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+            - npm run prisma:generate
+        build:
+          commands:
+            - npm run build
+      env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:postgres@localhost:5432/dev-db"
+    backend:
+      phases:
+        build:
+          commands:
+            - docker run -d --name dev-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dev-db postgres:14
+            - sleep 5
+            - npm run prisma:migrate:dev
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+    appRoot: .

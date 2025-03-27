@@ -5,7 +5,7 @@ export default function ReviewStep() {
 
   const handleSubmit = async () => {
     // Mark the onboarding as complete
-    await updateStepData('complete', true);
+    await updateStepData('complete' as any, true);
     updateStep(9);
   };
 

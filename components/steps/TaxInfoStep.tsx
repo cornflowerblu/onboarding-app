@@ -50,7 +50,6 @@ export default function TaxInfoStep() {
               label="Number of Dependents"
               name="dependents"
               type="number"
-              min="0"
             />
 
             <div className="mt-6 flex justify-between">

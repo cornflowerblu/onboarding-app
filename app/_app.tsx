@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import { OnboardingProvider } from '../context/OnboardingContext';
-import '../styles/globals.css';
+// import './globals.css';
 
 function Onboarding({ Component, pageProps }: AppProps) {
   const [isClient, setIsClient] = useState(false);

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { OnboardingState, OnboardingStep } from '../types/onboarding';
 
@@ -123,3 +125,5 @@ export function useOnboarding() {
   }
   return context;
 }
+
+export default OnboardingContext;

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CheckCircleIcon } from '@heroicons/react/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 export default function CompleteStep() {
   return (
@@ -32,9 +32,9 @@ export default function CompleteStep() {
       </div>
 
       <Link href="/">
-        <a className="inline-block px-6 py-3 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <span className="inline-block px-6 py-3 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           Return to Home
-        </a>
+        </span>
       </Link>
     </div>
   );

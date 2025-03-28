@@ -27,15 +27,18 @@ export default function PersonalInfoStep() {
   }
 
   const formatInitialValues = (state: OnboardingState) => {
-    if (!state.personalInfo?.dateOfBirth) return state.personalInfo;
+    if (!state.personalInfo?.dateOfBirth) {
+      console.log(state.personalInfo)
+      return state.personalInfo;
+    } 
+    
+    const formattedDate = new Date(state.personalInfo.dateOfBirth)
+    .toISOString()
+    .split('T')[0];  // This will give us just the date part
 
     return {
-      ...state.personalInfo,
-      dateOfBirth: new Date(state.personalInfo.dateOfBirth).toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric'
-      })
+     ...state.personalInfo,
+    dateOfBirth: formattedDate
     };
   };
 

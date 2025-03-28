@@ -4,7 +4,7 @@ import { bankingInfoSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
 
 export default function BankingInfoStep() {
-  const { state, updateStepData, updateStep } = useOnboarding();
+  const { state, updateStepData, updateStep, saveApplication } = useOnboarding();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -16,9 +16,20 @@ export default function BankingInfoStep() {
       <Formik
         initialValues={state.bankingInfo}
         validationSchema={bankingInfoSchema}
-        onSubmit={async (values) => {
-          await updateStepData('bankingInfo', values);
-          updateStep(6);
+        onSubmit={(values, {setSubmitting}) => {
+          try {
+            updateStepData('bankingInfo', values);          
+            updateStep(6);
+            saveApplication({
+              ...state,
+              currentStep: 6
+            });            
+          } catch (error) {
+            console.error('Error saving banking info:', error);
+          } finally {
+            setSubmitting(false)
+          }
+
         }}
       >
         {({ isSubmitting }) => (

@@ -50,17 +50,19 @@ export default function PersonalInfoStep() {
       <Formik
         initialValues={formatInitialValues(state)}
         validationSchema={personalInfoSchema}
-        onSubmit={async (values) => {
+        onSubmit={(values) => {
           // First update the state with the final form values
           const formattedValues = {
             ...values,
-            dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString() : null
+            dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString() : new Date().toISOString()
           };
           updateStepData('personalInfo', formattedValues);
-
-          // Then save the entire state
-          await saveApplication(state);
           updateStep(3);
+          saveApplication({
+            ...state,
+            personalInfo: formattedValues,
+            currentStep: 3
+          });
         }}
       >
         {({ values, isSubmitting }) => (

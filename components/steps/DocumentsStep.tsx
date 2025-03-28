@@ -3,7 +3,7 @@ import { Formik, Form } from 'formik';
 import { useOnboarding } from '../../context/OnboardingContext';
 
 export default function DocumentsStep() {
-  const { state, updateStepData, updateStep } = useOnboarding();
+  const { state, updateStepData, updateStep, saveApplication } = useOnboarding();
   const [idFileName, setIdFileName] = useState('');
   const [w4FileName, setW4FileName] = useState('');
 
@@ -19,14 +19,22 @@ export default function DocumentsStep() {
           idDocument: null,
           w4Document: null,
         }}
-        onSubmit={async (values) => {
-          // In a real app, you would upload these files to a server
-          // For this example, we'll just store the file names
-          await updateStepData('documents', {
-            idDocument: idFileName,
-            w4Document: w4FileName,
-          });
-          updateStep(8);
+        onSubmit={(values, {setSubmitting}) => {          
+          try {
+            updateStepData('documents', {
+              idDocument: idFileName,
+              w4Document: w4FileName,
+            });
+            updateStep(8);
+            saveApplication({
+              ...state,
+              currentStep: 8
+            });
+          } catch (error) {
+            console.error('Error saving application:', error)
+          } finally {
+            setSubmitting(false);
+          }
         }}
       >
         {({ isSubmitting, setFieldValue }) => (

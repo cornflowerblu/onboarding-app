@@ -120,6 +120,13 @@ The application can be deployed to AWS using Amplify with Aurora Serverless Post
 
 For current deployment instructions, refer to [README-AMPLIFY-RDS.md](./README-AMPLIFY-RDS.md).
 
+### Production Environment
+
+For production deployment, create a `prod.env` file based on the `prod.env.template`:
+
+1. Copy `prod.env.template` to `prod.env`
+2. Replace the placeholder values with your actual database credentials
+
 ## Development Tools
 
 - **Prisma Studio**: View and edit database records

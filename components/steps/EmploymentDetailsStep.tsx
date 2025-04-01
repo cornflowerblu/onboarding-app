@@ -2,24 +2,59 @@ import { Formik, Form } from 'formik';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { employmentDetailsSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
+import { OnboardingState } from '@/types/onboarding';
 
 export default function EmploymentDetailsStep() {
-  const { state, updateStepData, updateStep } = useOnboarding();
+  const { state, updateStepData, updateStep, saveApplication } = useOnboarding();
+
+  const handleBlur = (values: any) => {
+    updateStepData('employmentDetails', values)
+  }
+
+  const formatInitialValues = (state: OnboardingState) => {
+    if (!state.personalInfo?.dateOfBirth) {
+      console.log(state.personalInfo)
+      return state.employmentDetails;
+    }
+
+  const formattedDate = new Date(state.employmentDetails.startDate)
+    .toISOString()
+    .split('T')[0];  // This will give us just the date part
+
+  return {
+    ...state.employmentDetails,
+    startDate: formattedDate
+  };
+};
 
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Employment Details</h2>
 
       <Formik
-        initialValues={state.employmentDetails}
+        initialValues={formatInitialValues(state)}
         validationSchema={employmentDetailsSchema}
         onSubmit={async (values) => {
-          await updateStepData('employmentDetails', values);
+          const formattedValues = {
+            ...values,
+            startDate: values.startDate ? new Date(values.startDate).toISOString() : new Date().toISOString()
+          };
+          updateStepData('employmentDetails', formattedValues);
           updateStep(5);
+          saveApplication({
+            ...state,
+            employmentDetails: formattedValues,
+            currentStep: 5
+          });
         }}
       >
-        {({ isSubmitting }) => (
-          <Form className="space-y-4">
+        {({ values, isSubmitting }) => (
+          <Form className="space-y-4"
+          onBlur={() => {
+            const date = new Date(values.startDate).toISOString() || null;
+            handleBlur({ ...values, startDate: date })
+          }}
+          >
             <FormField
               label="Start Date"
               name="startDate"

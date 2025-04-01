@@ -1,12 +1,21 @@
+import { OnboardingState } from '@/types/onboarding';
 import { useOnboarding } from '../../context/OnboardingContext';
 
 export default function ReviewStep() {
-  const { state, updateStep, updateStepData } = useOnboarding();
+  const { state, updateStep, updateStepData, saveApplication } = useOnboarding();
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     // Mark the onboarding as complete
-    await updateStepData('complete' as any, true);
-    updateStep(9);
+    try {
+      updateStepData('complete' as any, true);
+      updateStep(9);
+      saveApplication({
+        ...state,
+        currentStep: 9
+      })
+    } catch (error) {
+      console.error('Error marking onboarding as complete:', error)
+    }
   };
 
   return (

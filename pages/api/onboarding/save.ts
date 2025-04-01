@@ -12,9 +12,9 @@ export default async function handler(
   }
 
   try {
-    const { step, data, identifier } = req.body;
+    const { currentStep, data, identifier } = req.body;
 
-    if (step === 'personalInfo' && !identifier?.email) {
+    if (currentStep === 2 && !identifier?.email) {
       return res.status(400).json({ message: 'Email is required' });
     }
 
@@ -56,8 +56,8 @@ export default async function handler(
       w4DocumentUrl: data.documents?.w4Document,
 
       // Meta fields
-      currentStep: step === 'complete' ? 9 : undefined,
-      isComplete: step === 'complete' ? true : undefined,
+      currentStep: data.currentStep,
+      isComplete: currentStep === 'complete' ? true : undefined,
     };
 
     const employee = await prisma.employee.upsert({
@@ -68,7 +68,6 @@ export default async function handler(
       create: {
         ...flattenedData,
         email: identifier.email,
-        currentStep: 2,
       },
     });
 

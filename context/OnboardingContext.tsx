@@ -6,9 +6,10 @@ import { OnboardingState, OnboardingStep } from '../types/onboarding';
 interface OnboardingContextType {
   state: OnboardingState;
   updateStep: (step: OnboardingStep) => void;
-  updateStepData: (stepName: keyof OnboardingState, data: any) => void;
+  updateStepData: (stepName: keyof OnboardingState, data: any) => Promise<unknown>;
   loadExistingApplication: (email: string) => Promise<boolean>;
   saveApplication: (application: OnboardingState) => Promise<void>;
+  getStatus: (email: string) => Promise<boolean>
 }
 
 const defaultState: OnboardingState = {
@@ -73,14 +74,29 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   };
 
   const updateStepData = async (stepName: keyof OnboardingState, data: any) => {
-    setState((prev: any) => {
-      const newState = { ...prev, [stepName]: data };
-      localStorage.setItem('onboardingState', JSON.stringify(newState));
-      return newState;
-    });
-
-    // Save to database
+    return new Promise((resolve) => {
+      setState((prev: any) => {
+        const newState = { ...prev, [stepName]: data };
+        localStorage.setItem('onboardingState', JSON.stringify(newState));
+        return newState;
+    })
+  });
   };
+
+  const getStatus = async (email: string) => {
+    try {
+      const response = await fetch(`/api/onboarding/load?email=${email}`);
+      const data = await response.json();
+      
+      const status = data.application.isComplete ? true : false
+
+      return status;
+
+    } catch (error) {
+      console.error('Failed to load application:', error);
+      return false;
+    }
+  }
 
   const saveApplication = async (application: OnboardingState) => {
     try {
@@ -92,7 +108,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       // Create a properly typed payload
       const payload = {
         identifier: userIdentifier,
-        data: application
+        data: application,
       };
   
       const response = await fetch('/api/onboarding/save', {
@@ -142,7 +158,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <OnboardingContext.Provider value={{ state, updateStep, updateStepData, loadExistingApplication, saveApplication }}>
+    <OnboardingContext.Provider value={{ state, updateStep, updateStepData, loadExistingApplication, saveApplication, getStatus }}>
       {children}
     </OnboardingContext.Provider>
   );

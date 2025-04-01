@@ -4,7 +4,7 @@ import { taxInfoSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
 
 export default function TaxInfoStep() {
-  const { state, updateStepData, updateStep } = useOnboarding();
+  const { state, updateStepData, updateStep, saveApplication } = useOnboarding();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -16,9 +16,19 @@ export default function TaxInfoStep() {
       <Formik
         initialValues={state.taxInfo}
         validationSchema={taxInfoSchema}
-        onSubmit={async (values) => {
-          await updateStepData('taxInfo', values);
+        onSubmit={(values, {setSubmitting}) => {
+          try {
+          updateStepData('taxInfo', values);
           updateStep(7);
+          saveApplication({
+            ...state,
+            currentStep: 7
+          });
+          } catch (error) {
+            console.error('Error saving application:', error)
+          } finally {
+            setSubmitting(false)
+          }        
         }}
       >
         {({ isSubmitting }) => (

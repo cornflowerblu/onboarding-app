@@ -4,7 +4,7 @@ import { emergencyContactSchema } from '../../utils/validationSchemas';
 import FormField from '../FormField';
 
 export default function EmergencyContactStep() {
-  const { state, updateStepData, updateStep } = useOnboarding();
+  const { state, updateStepData, updateStep, saveApplication } = useOnboarding();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -13,9 +13,14 @@ export default function EmergencyContactStep() {
       <Formik
         initialValues={state.emergencyContact}
         validationSchema={emergencyContactSchema}
-        onSubmit={async (values) => {
-          await updateStepData('emergencyContact', values);
+        onSubmit={(values) => {
+          console.log('Updating Step Data')
+          updateStepData('emergencyContact', values);
           updateStep(4);
+          saveApplication({
+            ...state,
+            currentStep: 4
+          });
         }}
       >
         {({ isSubmitting }) => (

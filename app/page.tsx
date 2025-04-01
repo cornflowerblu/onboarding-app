@@ -8,7 +8,7 @@ import { useOnboarding } from '../context/OnboardingContext';
 
 export default function HomePage() {
   const router = useRouter();
-  const { loadExistingApplication } = useOnboarding();
+  const { loadExistingApplication, updateStep, getStatus } = useOnboarding();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -62,9 +62,16 @@ export default function HomePage() {
                 onSubmit={async (values) => {
                   setLoading(true);
                   setError('');
-                  try {
+                  try {                    
                     const exists = await loadExistingApplication(values.email);
                     if (exists) {
+                      const isComplete = await getStatus(values.email)                        
+                      if (isComplete) {
+                        console.log('updating the step')
+                        updateStep(9)
+                        router.push('/onboarding');
+                      }                      
+                    
                       router.push('/onboarding');
                     } else {
                       setError('No existing application found for this email');

@@ -29,6 +29,7 @@ export default async function handler(
     // Transform the database record into the application state format
     const applicationState = {
       currentStep: employee.currentStep,
+      isComplete: employee.isComplete,
       personalInfo: {
         email: employee.email,
         firstName: employee.firstName || '',
